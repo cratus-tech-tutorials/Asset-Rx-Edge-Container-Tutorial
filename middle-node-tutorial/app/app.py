@@ -5,17 +5,6 @@ import requests
 from flask import Flask, render_template
 app = Flask(__name__)
 
-''' 
-Participate in a data pipeline here '''
-@app.route("/get")
-def get():
-    response_data = {
-        "message": "Hello world from Cratus!"}
-    return app.response_class(
-        response=json.dumps(response_data),
-        status=200,
-        mimetype='application/json')
-
 local_docker_network_ip = None
 def get_target():
     global local_docker_network_ip
@@ -53,4 +42,4 @@ def get():
         print(e)
 
 if __name__ == "__main__":
-    app.run(debug=False, host='0.0.0.0', port=8080)
+    app.run(debug=False, host='0.0.0.0', port=8081)
