@@ -27,18 +27,15 @@ def get_target():
     global local_docker_network_ip
     if (not local_docker_network_ip):
         local_docker_network_ip = socket.gethostbyname(socket.gethostname())    
-        subnet_mask = local_docker_network_ip[:-2]
+    subnet_mask = local_docker_network_ip[:-2]
     target = subnet_mask + ".0" + str(3)
     return target
-def get_debug_target():
-    return "0.0.0.0"
 
 @app.route("/get")
 def get():
     try:
-        target = get_target() if not DEBUG_TARGET else get_debug_target()
-        endpoint = f"http://{target}:{TARGET_PORT}/get"
-        response = requests.get(endpoint)
+        upstream_container = f"http://{get_target()}:8080/get"
+        response = requests.get(upstream_container)
         if response.status_code == 200:
             j = response.json()
             if "image" in j:
@@ -52,19 +49,14 @@ def get():
 
                 with torch.no_grad():
                     inf = NET(im).item()
-                if inf == 0:
-                    blink = False
-                else:
-                    blink = True
-                
-                data = j
-                if "inference" not in data:
-                    data["inference"] = []
-                if blink:
-                    data["inference"].append({"class": "blink"})
+                if "inference" not in j:
+                    j["inference"] = []
+                print(inf)
+                cls = "class_1" if inf <= 0 else "class_2"
+                j["inference"].append({"class": cls})
 
                 return app.response_class(
-                    response=json.dumps(data),
+                    response=json.dumps(j),
                     status=200,
                     mimetype='application/json')
 
@@ -72,13 +64,4 @@ def get():
         print(e)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('-p', "--port", type=int, default=8080,help='the port its hosted on')
-    parser.add_argument('-t', "--target-port", type=int, default=8080,help='the port to bang')
-    parser.add_argument('-l', "--localhost-target", action='store_true', help='enable if not running in docker virtual network')
-    args = parser.parse_args()
-    
-    DEBUG_TARGET = args.localhost_target
-    TARGET_PORT = args.target_port
-
-    app.run(debug=False, host='0.0.0.0', port=args.port)
+    app.run(debug=False, host='0.0.0.0', port=8080)
