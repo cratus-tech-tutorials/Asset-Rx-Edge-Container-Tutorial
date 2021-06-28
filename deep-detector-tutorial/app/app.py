@@ -55,10 +55,10 @@ def get():
                 cls = "class_1" if inf <= 0 else "class_2"
                 j["inference"].append({"class": cls})
 
-                return app.response_class(
-                    response=json.dumps(j),
-                    status=200,
-                    mimetype='application/json')
+            return app.response_class(
+                response=json.dumps(j),
+                status=200,
+                mimetype='application/json')
 
     except Exception as e:
         print(e)
