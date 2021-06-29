@@ -7,12 +7,15 @@ app = Flask(__name__)
 Participate in a data pipeline here '''
 @app.route("/get")
 def get():
-    response_data = {
-        "message": "Hello world from Cratus!"}
-    return app.response_class(
-        response=json.dumps(response_data),
-        status=200,
-        mimetype='application/json')
+    try:
+        response_data = {
+            "message": "Hello world from Cratus!"}
+        return app.response_class(
+            response=json.dumps(response_data),
+            status=200,
+            mimetype='application/json')
+    except Exception as e:
+        print(e)
 
 ''' 
 Serve Interactive container frontends and Analytics Dashboards here.'''
